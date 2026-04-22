@@ -1,0 +1,4 @@
+networkx
+numpy<2
+matplotlib
+pytest
