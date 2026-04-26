@@ -19,7 +19,7 @@ def _print_summary(summary: dict[str, dict[str, float]]) -> None:
         f"{'Feasible %':>13}{'Avg Delivery Cost':>20}"
     )
     print("-" * 92)
-    for algo in ("astar", "bfs", "greedy"):
+    for algo in ("astar", "dijkstra", "greedy"):
         row = summary[algo]
         print(
             f"{algo:<12}{row['avg_cost']:>12.2f}{row['avg_time_ms']:>15.2f}"

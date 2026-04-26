@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import deque
 import heapq
 import itertools
 import logging
@@ -95,7 +94,7 @@ def astar(
     return None, 0.0, elapsed, explored, False
 
 
-def bfs(
+def dijkstra(
     graph: "nx.Graph",
     start: str,
     goal: str,
@@ -106,8 +105,8 @@ def bfs(
     track_expansions: dict[str, int] | None = None,
     max_expansions: int = 15000,
 ) -> tuple[list[str] | None, float, float, int, bool]:
-    """Run BFS and return first feasible solution encountered."""
-    logger.info("BFS started from %s to %s", start, goal)
+    """Run Dijkstra's algorithm with battery/time-window feasibility pruning."""
+    logger.info("Dijkstra started from %s to %s", start, goal)
     t0 = time.perf_counter()
 
     start_state = State(
@@ -117,37 +116,40 @@ def bfs(
         path=[start],
         cost=0.0,
     )
-    queue: deque[State] = deque([start_state])
-    visited: set[tuple[str, float, float]] = {state_key(start_state, constraints)}
+    pq: list[tuple[float, int, State]] = []
+    counter = itertools.count()
+    heapq.heappush(pq, (0.0, next(counter), start_state))
+    best_cost: dict[tuple[str, float, float], float] = {state_key(start_state, constraints): 0.0}
     explored = 0
 
-    while queue:
-        state = queue.popleft()
+    while pq:
+        _, _, state = heapq.heappop(pq)
         explored += 1
         if explored >= max_expansions:
             elapsed = (time.perf_counter() - t0) * 1000.0
-            logger.warning("BFS hit expansion limit (%s) from %s to %s", max_expansions, start, goal)
+            logger.warning("Dijkstra hit expansion limit (%s) from %s to %s", max_expansions, start, goal)
             return None, 0.0, elapsed, explored, False
         if track_expansions is not None:
             track_expansions[state.node_id] = track_expansions.get(state.node_id, 0) + 1
         if state.node_id == goal:
             elapsed = (time.perf_counter() - t0) * 1000.0
-            logger.info("BFS found feasible route with cost %.2f", state.cost)
+            logger.info("Dijkstra found feasible route with cost %.2f", state.cost)
             return state.path, state.cost, elapsed, explored, True
 
         for nxt in graph.neighbors(state.node_id):
             next_state, reason = transition_state(graph, state, nxt, constraints)
             if next_state is None:
-                logger.debug("BFS pruned transition %s -> %s due to %s", state.node_id, nxt, reason)
+                logger.debug("Dijkstra pruned transition %s -> %s due to %s", state.node_id, nxt, reason)
                 continue
             key = state_key(next_state, constraints)
-            if key in visited:
+            known = best_cost.get(key)
+            if known is not None and known <= next_state.cost:
                 continue
-            visited.add(key)
-            queue.append(next_state)
+            best_cost[key] = next_state.cost
+            heapq.heappush(pq, (next_state.cost, next(counter), next_state))
 
     elapsed = (time.perf_counter() - t0) * 1000.0
-    logger.warning("BFS failed to find feasible route from %s to %s", start, goal)
+    logger.warning("Dijkstra failed to find feasible route from %s to %s", start, goal)
     return None, 0.0, elapsed, explored, False
 
 

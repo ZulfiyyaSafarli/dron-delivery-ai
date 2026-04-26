@@ -11,7 +11,7 @@ from typing import Callable
 import networkx as nx
 import numpy as np
 
-from .algorithms import astar, bfs, euclidean_heuristic, greedy_bfs
+from .algorithms import astar, dijkstra, euclidean_heuristic, greedy_bfs
 from .constraints import ConstraintConfig, evaluate_path
 from .graph import GraphConfig, assign_time_windows, build_city_graph, nearest_neighbor_order, sample_delivery_stops
 
@@ -97,8 +97,8 @@ def _run_leg(
             initial_time=current_time,
             track_expansions=expansion_histogram,
         )
-    if algo_name == "bfs":
-        return bfs(
+    if algo_name == "dijkstra":
+        return dijkstra(
             graph,
             start,
             goal,
@@ -124,9 +124,9 @@ def run_scenario_algorithms(
     constraints: ConstraintConfig,
     failure_penalty: float,
 ) -> list[AlgorithmScenarioResult]:
-    """Run A*, BFS, and Greedy for one scenario."""
+    """Run A*, Dijkstra, and Greedy for one scenario."""
     results: list[AlgorithmScenarioResult] = []
-    algorithms = ["astar", "bfs", "greedy"]
+    algorithms = ["astar", "dijkstra", "greedy"]
     goals = [scenario.start] + scenario.ordered_stops
 
     for algo_name in algorithms:
@@ -203,7 +203,7 @@ def run_experiments(
         all_results.extend(run_scenario_algorithms(scenario, constraints, constraints.failed_delivery_penalty))
 
     summary: dict[str, dict[str, float]] = {}
-    for algo in ("astar", "bfs", "greedy"):
+    for algo in ("astar", "dijkstra", "greedy"):
         subset = [r for r in all_results if r.algorithm == algo]
         feasible_rate = sum(1 for r in subset if r.feasible) / len(subset) if subset else 0.0
         summary[algo] = {

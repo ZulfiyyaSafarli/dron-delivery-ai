@@ -1,21 +1,21 @@
 {
   "astar": {
     "avg_cost": 15.0467,
-    "avg_time_ms": 317.2885,
+    "avg_time_ms": 339.1224,
     "avg_explored_nodes": 12061.0,
     "feasibility_rate": 20.0,
     "avg_delivery_cost": 175.0467
   },
-  "bfs": {
-    "avg_cost": 20.7978,
-    "avg_time_ms": 249.5071,
-    "avg_explored_nodes": 12459.7,
+  "dijkstra": {
+    "avg_cost": 15.0467,
+    "avg_time_ms": 272.7528,
+    "avg_explored_nodes": 12377.0,
     "feasibility_rate": 20.0,
-    "avg_delivery_cost": 180.7978
+    "avg_delivery_cost": 175.0467
   },
   "greedy": {
     "avg_cost": 22.497,
-    "avg_time_ms": 315.3927,
+    "avg_time_ms": 288.6486,
     "avg_explored_nodes": 12010.2,
     "feasibility_rate": 20.0,
     "avg_delivery_cost": 182.497

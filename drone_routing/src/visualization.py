@@ -21,7 +21,7 @@ def plot_scenario_routes(
     pos = {n: graph.nodes[n]["pos"] for n in graph.nodes}
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 5), constrained_layout=True)
-    for axis, algo in zip(axes, ["astar", "bfs", "greedy"]):
+    for axis, algo in zip(axes, ["astar", "dijkstra", "greedy"]):
         axis.set_title(f"Scenario {scenario.scenario_id} - {algo.upper()}")
         nx.draw_networkx_edges(graph, pos, ax=axis, alpha=0.2, width=0.8)
         nx.draw_networkx_nodes(graph, pos, ax=axis, node_size=25, node_color="#87ceeb")
@@ -48,7 +48,7 @@ def plot_metric_comparison(
 ) -> None:
     """Plot high-level metric comparison charts."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    algorithms = ["astar", "bfs", "greedy"]
+    algorithms = ["astar", "dijkstra", "greedy"]
 
     metrics = [
         ("avg_cost", "Average Cost"),
